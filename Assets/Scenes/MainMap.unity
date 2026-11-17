@@ -129,7 +129,7 @@ GameObject:
   m_Component:
   - component: {fileID: 202513617}
   - component: {fileID: 202513618}
-  - component: {fileID: 202513619}
+  - component: {fileID: 202513620}
   m_Layer: 0
   m_Name: Isometric Forest Tileset_Environment - Water 01
   m_TagString: Untagged
@@ -197,8 +197,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -1952458221
+  m_SortingLayer: 3
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: 64b20004cf2dfeb40bce917091c6efcb, type: 3}
@@ -211,8 +211,8 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
---- !u!61 &202513619
-BoxCollider2D:
+--- !u!68 &202513620
+EdgeCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -246,17 +246,25 @@ BoxCollider2D:
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 6, y: 2.4}
-    newSize: {x: 6, y: 2.4}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  m_Size: {x: 6, y: 2.4}
   m_EdgeRadius: 0
+  m_Points:
+  - {x: 0.03139496, y: 1.0527433}
+  - {x: -1.0573263, y: 0.66064066}
+  - {x: -2.1818647, y: 0.6681915}
+  - {x: -2.7726812, y: 0.3731966}
+  - {x: -2.8798666, y: -0.3642099}
+  - {x: -2.1597414, y: -0.94120455}
+  - {x: 0.014939308, y: -1.1542128}
+  - {x: 2.0603523, y: -0.89671564}
+  - {x: 2.7798958, y: -0.44466162}
+  - {x: 2.8087711, y: 0.45294082}
+  - {x: 2.2489243, y: 0.9752975}
+  - {x: 0.88815594, y: 1.1868364}
+  - {x: 0.032024384, y: 1.0527433}
+  m_AdjacentStartPoint: {x: 0, y: 0}
+  m_AdjacentEndPoint: {x: 0, y: 0}
+  m_UseAdjacentStartPoint: 0
+  m_UseAdjacentEndPoint: 0
 --- !u!1 &330158660
 GameObject:
   m_ObjectHideFlags: 0
@@ -294,7 +302,7 @@ MonoBehaviour:
   m_Intensity: 1
   m_LightVolumeIntensity: 1
   m_LightVolumeEnabled: 0
-  m_ApplyToSortingLayers: 000000006fb618c70dfcb9ea33add704
+  m_ApplyToSortingLayers: 000000006fb618c70dfcb9ea33add704c7c5aa456b5ef11d13da9f8bb5b585d7
   m_LightCookieSprite: {fileID: 0}
   m_DeprecatedPointLightCookieSprite: {fileID: 0}
   m_LightOrder: 0
@@ -418,8 +426,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 81243443
-  m_SortingLayer: 1
+  m_SortingLayerID: 1168819655
+  m_SortingLayer: 4
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: 61bd498ba5e10eb44a86282e50898186, type: 3}
@@ -511,7 +519,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 81243443
-  m_SortingLayer: 1
+  m_SortingLayer: 6
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: a087137efe4ba9b4fbd795ec21800ee3, type: 3}
@@ -680,8 +688,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 1168819655
+  m_SortingLayer: 4
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: 3e0af731c41bdaa479531c2eaf6f5806, type: 3}
@@ -772,8 +780,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 81243443
+  m_SortingLayer: 6
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: b735d346610dc2b4b8de41d5dc7b597c, type: 3}
@@ -820,7 +828,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0.05, y: -1.8}
+  m_Offset: {x: 0.02, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -1130,8 +1138,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -679103051
+  m_SortingLayer: 5
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: 0f36b91d46af57841a541e5fad79b3e1, type: 3}
@@ -1222,8 +1230,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 81243443
+  m_SortingLayer: 6
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: 3b5cbf1c88ba0d14a934fb521f45a882, type: 3}
@@ -1270,7 +1278,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0.05, y: -1.8}
+  m_Offset: {x: 0.37, y: -2.32}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -1393,8 +1401,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 502357611
+  m_SortingLayer: 7
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: b217be5a515714748b64beca6d68bee7, type: 3}
@@ -1580,8 +1588,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 1168819655
+  m_SortingLayer: 4
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: 079c48b888064614485e9ef896d6e0c2, type: 3}
@@ -1706,6 +1714,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player.PlayerController
   _moveSpeed: 5
+  _animator: {fileID: 807038226}
+  _spriteRenderer: {fileID: 807038227}
 --- !u!70 &1082461585
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -2025,8 +2035,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 1168819655
+  m_SortingLayer: 4
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: 9c6cff1e3135af24fbb7b83255efc39e, type: 3}
@@ -2303,8 +2313,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 81243443
+  m_SortingLayer: 6
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: 1a91596fb928f8945859ef767dece29c, type: 3}
@@ -2351,7 +2361,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0.05, y: -1.8}
+  m_Offset: {x: 0.05, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -2441,8 +2451,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 81243443
+  m_SortingLayer: 6
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: a087137efe4ba9b4fbd795ec21800ee3, type: 3}
@@ -2692,8 +2702,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 81243443
+  m_SortingLayer: 6
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: a087137efe4ba9b4fbd795ec21800ee3, type: 3}
@@ -2830,8 +2840,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 81243443
-  m_SortingLayer: 1
+  m_SortingLayerID: 502357611
+  m_SortingLayer: 7
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: 69efc2301885a474e8b8642024cc0d8f, type: 3}
@@ -2975,8 +2985,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -1952458221
+  m_SortingLayer: 3
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: 215f88dc22d28874e95d662fda5e1a56, type: 3}
@@ -2989,8 +2999,8 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
---- !u!61 &2143435376
-BoxCollider2D:
+--- !u!68 &2143435376
+EdgeCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -3024,17 +3034,28 @@ BoxCollider2D:
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 8.4, y: 3.6}
-    newSize: {x: 8.4, y: 3.6}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  m_Size: {x: 8.4, y: 3.6}
   m_EdgeRadius: 0
+  m_Points:
+  - {x: 0.6578388, y: 0.9385903}
+  - {x: -0.23852062, y: 1.576015}
+  - {x: -1.8824549, y: 1.8061569}
+  - {x: -3.3572626, y: 1.5593452}
+  - {x: -4.2349424, y: 0.64507484}
+  - {x: -4.164242, y: -0.45923328}
+  - {x: -3.357935, y: -1.1169591}
+  - {x: -1.2068834, y: -1.2806478}
+  - {x: 0.4855032, y: -0.91322327}
+  - {x: 2.4538937, y: -1.7460732}
+  - {x: 3.7314682, y: -1.5846748}
+  - {x: 4.2669735, y: -1.0567255}
+  - {x: 3.7875557, y: 0.11995745}
+  - {x: 2.3963337, y: 0.26910877}
+  - {x: 1.404459, y: 0.2467041}
+  - {x: 0.7880974, y: 0.83712125}
+  m_AdjacentStartPoint: {x: 0, y: 0}
+  m_AdjacentEndPoint: {x: 0, y: 0}
+  m_UseAdjacentStartPoint: 0
+  m_UseAdjacentEndPoint: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
