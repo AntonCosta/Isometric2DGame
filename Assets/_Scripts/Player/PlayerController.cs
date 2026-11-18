@@ -42,6 +42,8 @@ namespace Player
                     _moveValue.y == 0 ? 0 : Mathf.Sign(_moveValue.y)
                 );
             }
+            
+            _spriteRenderer.sortingOrder = Mathf.RoundToInt(-transform.position.y * 100);
         }
 
         // Update is called once per frame
