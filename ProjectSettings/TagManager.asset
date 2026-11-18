@@ -41,26 +41,14 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
-  - name: Background
-    uniqueID: 3340285551
-    locked: 0
   - name: Ground
     uniqueID: 3938057229
     locked: 0
-  - name: Ponds
-    uniqueID: 2342509075
+  - name: Paths
+    uniqueID: 178474611
     locked: 0
-  - name: Grass
-    uniqueID: 1168819655
-    locked: 0
-  - name: Player
+  - name: Other
     uniqueID: 3615864245
-    locked: 0
-  - name: Trees
-    uniqueID: 81243443
-    locked: 0
-  - name: Rocks
-    uniqueID: 502357611
     locked: 0
   m_RenderingLayers:
   - Default

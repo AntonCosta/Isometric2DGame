@@ -6,8 +6,12 @@ namespace Player
 {
     public class PlayerController : MonoBehaviour
     {
-        private const string IS_RUNNING = "IsRunning";
-        private static readonly int RUNNING = Animator.StringToHash(IS_RUNNING);
+        private const string MOVE_X = "MoveX";
+        private const string MOVE_Y = "MoveY";
+        private const string SPEED = "Speed";
+        private static readonly int MOVE_X_HASH = Animator.StringToHash(MOVE_X);
+        private static readonly int MOVE_Y_HASH = Animator.StringToHash(MOVE_Y);
+        private static readonly int SPEED_HASH = Animator.StringToHash(SPEED);
         
         [SerializeField] private float _moveSpeed = 5f;
         [SerializeField] private float _acceleration = 0f;
@@ -17,6 +21,7 @@ namespace Player
         private Rigidbody2D _rb;
         private InputAction _moveAction;
         private Vector2 _moveValue;
+        private Vector2 _lastFacingDirection = Vector2.down;
         
         
         // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -30,21 +35,29 @@ namespace Player
         {
             _moveValue = _moveAction.ReadValue<Vector2>();
 
-            if (_moveValue.x > 0)
+            if (_moveValue.sqrMagnitude > 0.01f)
             {
-                _spriteRenderer.flipX = false;
+                _lastFacingDirection = new Vector2(
+                    _moveValue.x == 0 ? 0 : Mathf.Sign(_moveValue.x),
+                    _moveValue.y == 0 ? 0 : Mathf.Sign(_moveValue.y)
+                );
             }
-            else if (_moveValue.x < 0)
-            {
-                _spriteRenderer.flipX = true;
-            }
+            
+            _spriteRenderer.sortingOrder = Mathf.RoundToInt(-transform.position.y * 100);
         }
 
         // Update is called once per frame
         void FixedUpdate()
         {
             _rb.linearVelocity = Vector2.Lerp(_rb.linearVelocity, _moveValue.normalized * _moveSpeed, _acceleration != 0 ? _acceleration * Time.fixedDeltaTime : 1);
-            _animator.SetBool(RUNNING, _moveValue != Vector2.zero);
+            
+            var speed = _moveValue.sqrMagnitude;
+            if (speed > 0.01f)
+            {
+                _animator.SetFloat(MOVE_X_HASH, _lastFacingDirection.x);
+                _animator.SetFloat(MOVE_Y_HASH, _lastFacingDirection.y);
+            }
+            _animator.SetFloat(SPEED_HASH, speed);
         }
     }
 }
