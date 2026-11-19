@@ -13,7 +13,9 @@ namespace Enemy
         public Transform GetWaypoint(int index)
         {
             if (_waypoints == null || _waypoints.Length == 0)
+            {
                 return null;
+            }
 
             return _waypoints[index];
         }

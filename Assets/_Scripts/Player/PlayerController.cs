@@ -9,12 +9,15 @@ namespace Player
     {
         private static float DAMAGE_FLASH_DURATION = 0.3f;
         
+        [Header("References")]
+        [SerializeField] private Animator _animator;
+        [SerializeField] private SpriteRenderer _spriteRenderer;
+
+        [Header("Stats")]
         [SerializeField] private float _maxHealth = 100f;
         [SerializeField] private float _health = 100f;
         [SerializeField] private float _moveSpeed = 3f;
         [SerializeField] private float _acceleration = 0f;
-        [SerializeField] private Animator _animator;
-        [SerializeField] private SpriteRenderer _spriteRenderer;
 
         private Rigidbody2D _rb;
         private InputAction _moveAction;

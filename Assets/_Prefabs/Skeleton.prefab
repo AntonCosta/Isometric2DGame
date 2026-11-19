@@ -124,6 +124,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7122411053772875462}
   - component: {fileID: 8859311801493022853}
+  - component: {fileID: 3005148335986756355}
   - component: {fileID: 5762415946684558698}
   - component: {fileID: 3528706902862304353}
   - component: {fileID: 8886668626692943541}
@@ -162,17 +163,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ffc268409ce861444a6b64bb26970ace, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyController
-  _pathfinder: {fileID: 0}
   _animator: {fileID: 4769430579834252909}
   _spriteRenderer: {fileID: 1376711061086467794}
   _runSpeed: 1.5
   _walkSpeed: 0.5
-  _nextPathPointDistance: 0.2
   _detectionRange: 1
   _detectionCollider: {fileID: 8886668626692943541}
   _damage: 10
   _attackSpeed: 1
-  _attackDistance: 0.3
+  _attackRange: 0.3
+--- !u!114 &3005148335986756355
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7202277991089639024}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd698c465ee51114483bc6a04a05324d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Enemy.EnemyMovementController
+  _pathfinder: {fileID: 0}
+  _nextPathPointDistance: 0.2
   _repathInterval: 0.3
   _pathTargetDistance: 0.45
   _patrolRoutes:
