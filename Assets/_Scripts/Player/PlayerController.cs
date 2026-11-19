@@ -1,6 +1,7 @@
 using System;
 using Combat;
 using DG.Tweening;
+using UI;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -15,6 +16,7 @@ namespace Player
         [SerializeField] private SpriteRenderer _spriteRenderer;
         [SerializeField] private Transform _attackHitbox;
         [SerializeField] private Collider2D _attackHitboxCollider;
+        [SerializeField] private UIHealthController _uiHealthController;
 
         [Header("Stats")]
         [SerializeField] private float _maxHealth = 100f;
@@ -153,6 +155,8 @@ namespace Player
             _damageFlashTween = _spriteRenderer
                 .DOColor(Color.red, DAMAGE_FLASH_DURATION)
                 .SetLoops(2, LoopType.Yoyo);
+            
+            _uiHealthController.UpdateHealth(_health, _maxHealth);
             
         }
     }

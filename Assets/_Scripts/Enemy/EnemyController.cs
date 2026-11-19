@@ -4,6 +4,7 @@ using Combat;
 using DG.Tweening;
 using Pathfinding;
 using Player;
+using UI;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -20,9 +21,8 @@ namespace Enemy
         public Transform Target => _target;
         public float RunSpeed => _runSpeed;
         public float WalkSpeed => _walkSpeed;
-        public bool IsAttacking => _isAttacking; 
-        public bool IsAttackLocked => _isAttacking || _attackEndMovementLockTimer > 0f;
-        public bool CanMove => !_isAttacking && _attackEndMovementLockTimer <= 0f;
+        public bool IsAttackLocked => _isAttacking;
+        public bool CanMove => !_isAttacking;
         public bool LostTargetDuringAttack { get; set; }
 
         [Header("References")]
@@ -30,8 +30,10 @@ namespace Enemy
         [SerializeField] private SpriteRenderer _spriteRenderer;
         [SerializeField] private Transform _attackHitbox;
         [SerializeField] private Collider2D _attackHitboxCollider;
+        [SerializeField] private UIHealthController _uiHealthController;
         
         [Header("Stats")]
+        [SerializeField] private float _maxHealth = 100f;
         [SerializeField] private float _health = 100f;
         [SerializeField] private float _runSpeed = 1.5f;
         [SerializeField] private float _walkSpeed = 0.5f;
@@ -45,7 +47,6 @@ namespace Enemy
         private Vector2 _lastFacingDirection = Vector2.down;
         private Tween _damageFlashTween;
         private bool _isAttacking;
-        private float _attackEndMovementLockTimer;
 
         private void Awake()
         {
@@ -66,20 +67,6 @@ namespace Enemy
 
         private void FixedUpdate()
         {
-            if (_attackEndMovementLockTimer > 0f)
-            {
-                _attackEndMovementLockTimer -= Time.fixedDeltaTime;
-                _enemyMovementController.StopMoving();
-
-                if (_attackEndMovementLockTimer <= 0f)
-                {
-                    _attackEndMovementLockTimer = 0f;
-                    ResolveAfterAttack();
-                }
-
-                return;
-            }
-
             switch (_currentState)
             {
                 case EnemyState.Attack:
@@ -146,14 +133,7 @@ namespace Enemy
             _animator.SetBool(Utils.IS_ATTACKING_HASH, _isAttacking);
             
             _enemyMovementController.StopMoving();
-
-            _attackEndMovementLockTimer = Time.fixedDeltaTime * 20f;
-        }
-
-        private void ResolveAfterAttack()
-        {
-            _enemyMovementController.StopMoving();
-
+            
             if (!_target || !_playerController || LostTargetDuringAttack)
             {
                 ClearTarget();
@@ -263,6 +243,7 @@ namespace Enemy
             _damageFlashTween = _spriteRenderer
                 .DOColor(Color.red, DAMAGE_FLASH_DURATION)
                 .SetLoops(2, LoopType.Yoyo);
+            _uiHealthController.UpdateHealth(_health, _maxHealth);
         }
     }
 }
