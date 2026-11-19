@@ -1,4 +1,5 @@
 using System;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -6,28 +7,32 @@ namespace Player
 {
     public class PlayerController : MonoBehaviour
     {
-        private const string MOVE_X = "MoveX";
-        private const string MOVE_Y = "MoveY";
-        private const string SPEED = "Speed";
-        private static readonly int MOVE_X_HASH = Animator.StringToHash(MOVE_X);
-        private static readonly int MOVE_Y_HASH = Animator.StringToHash(MOVE_Y);
-        private static readonly int SPEED_HASH = Animator.StringToHash(SPEED);
+        private static float DAMAGE_FLASH_DURATION = 0.3f;
         
-        [SerializeField] private float _moveSpeed = 5f;
+        [Header("References")]
+        [SerializeField] private Animator _animator;
+        [SerializeField] private SpriteRenderer _spriteRenderer;
+
+        [Header("Stats")]
+        [SerializeField] private float _maxHealth = 100f;
+        [SerializeField] private float _health = 100f;
+        [SerializeField] private float _moveSpeed = 3f;
         [SerializeField] private float _acceleration = 0f;
-        [SerializeField]  private Animator _animator;
-        [SerializeField]  private SpriteRenderer _spriteRenderer;
 
         private Rigidbody2D _rb;
         private InputAction _moveAction;
         private Vector2 _moveValue;
         private Vector2 _lastFacingDirection = Vector2.down;
-        
-        
-        // Start is called once before the first execution of Update after the MonoBehaviour is created
-        private void Start()
+        private Tween _damageFlashTween;
+
+
+        private void Awake()
         {
             _rb = GetComponent<Rigidbody2D>();
+        }
+
+       private void Start()
+        {
             _moveAction = InputSystem.actions.FindAction("Move");
         }
 
@@ -54,10 +59,22 @@ namespace Player
             var speed = _moveValue.sqrMagnitude;
             if (speed > 0.01f)
             {
-                _animator.SetFloat(MOVE_X_HASH, _lastFacingDirection.x);
-                _animator.SetFloat(MOVE_Y_HASH, _lastFacingDirection.y);
+                _animator.SetFloat(Utils.MOVE_X_HASH, _lastFacingDirection.x);
+                _animator.SetFloat(Utils.MOVE_Y_HASH, _lastFacingDirection.y);
             }
-            _animator.SetFloat(SPEED_HASH, speed);
+            _animator.SetFloat(Utils.SPEED_HASH, speed);
+        }
+
+        public void TakeDamage(float ammount)
+        {
+            _health -= ammount;
+            _damageFlashTween?.Kill();
+            _spriteRenderer.color = Color.white;
+
+            _damageFlashTween = _spriteRenderer
+                .DOColor(Color.red, DAMAGE_FLASH_DURATION)
+                .SetLoops(2, LoopType.Yoyo);
+            
         }
     }
 }
