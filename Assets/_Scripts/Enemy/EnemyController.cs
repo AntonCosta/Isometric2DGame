@@ -13,10 +13,12 @@ namespace Enemy
     public class EnemyController : AnimationEventsListener, IDamageable
     {
         private const float DAMAGE_FLASH_DURATION = 0.3f;
+        private const float DETECTION_RANGE_INCREASE_AMOUNT = 1f;
 
         public EnemyState CurrentState => _currentState;
         public Rigidbody2D Rigidbody => _rb;
         public Animator Animator => _animator;
+        public EnemyDetectionController DetectionController => _detectionController;
         public float AttackRange => _attackRange;
         public Transform Target => _target;
         public float RunSpeed => _runSpeed;
@@ -32,6 +34,7 @@ namespace Enemy
         [SerializeField] private Transform _attackHitbox;
         [SerializeField] private Collider2D _attackHitboxCollider;
         [SerializeField] private UIHealthController _uiHealthController;
+        [SerializeField] private EnemyDetectionController _detectionController;
         
         [Header("Stats")]
         [SerializeField] private float _maxHealth = 30f;
@@ -278,6 +281,8 @@ namespace Enemy
                 .DOColor(Color.red, DAMAGE_FLASH_DURATION)
                 .SetLoops(2, LoopType.Yoyo);
             _uiHealthController.UpdateHealth(_health, _maxHealth);
+            
+            _detectionController.IncreaseDetectionRange(DETECTION_RANGE_INCREASE_AMOUNT);
             
             _canMove = false;
             _animator.SetBool(Utils.TAKE_DAMAGE_HASH, true);

@@ -10,10 +10,14 @@ namespace Enemy
         [SerializeField] private EnemyMovementController _enemyMovementController;
         [SerializeField] private CircleCollider2D _detectionCollider;
         [SerializeField] private float _detectionRange = 1f;
+        [SerializeField] private float _maximumDetectionRange = 3f;
 
-        private void Start()
+        private float _initialDetectionRange;
+
+        private void Awake()
         {
             _detectionCollider.radius = _detectionRange;
+            _initialDetectionRange = _detectionRange;
         }
 
         private void OnTriggerEnter2D(Collider2D other)
@@ -37,7 +41,6 @@ namespace Enemy
             
             _enemyController.SetTarget(playerController);
             _enemyController.ChangeState(EnemyState.Chase);
-
 
             _enemyMovementController.FoundTarget();
         }
@@ -65,5 +68,24 @@ namespace Enemy
 
             _enemyMovementController.LostTarget();
         }
+        
+        public void IncreaseDetectionRange(float amount)
+        {
+            _detectionRange = Mathf.Clamp(_detectionRange + amount, 0, _maximumDetectionRange);
+            _detectionCollider.radius = _detectionRange;
+        }
+        
+        public void DecreaseDetectionRange(float amount)
+        {
+            _detectionRange = Mathf.Clamp(_detectionRange - amount, 0, _maximumDetectionRange);
+            _detectionCollider.radius = _detectionRange;
+        }
+
+        public void ResetDetectionRange()
+        {
+            _detectionRange = _initialDetectionRange;
+            _detectionCollider.radius = _detectionRange;
+        }
+
     }
 }

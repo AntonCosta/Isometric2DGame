@@ -8,16 +8,18 @@ namespace Enemy
 {
     public class EnemyMovementController : MonoBehaviour
     {
-        [Header("References")] [SerializeField]
-        private AStarPathfinder _pathfinder;
+        [Header("References")] 
+        [SerializeField] private AStarPathfinder _pathfinder;
 
-        [Header("Pathfinding")] [SerializeField]
-        private float _nextPathPointDistance = 0.2f;
+        [Header("Pathfinding")] 
+        [SerializeField] private float _nextPathPointDistance = 0.2f;
 
-        [Header("Chase")] [SerializeField] private float _repathInterval = 0.3f;
+        [Header("Chase")] 
+        [SerializeField] private float _repathInterval = 0.3f;
         [SerializeField] private float _pathTargetDistance = 0.45f;
 
-        [Header("Patrol")] [SerializeField] private PatrolRoute[] _patrolRoutes;
+        [Header("Patrol")] 
+        [SerializeField] private PatrolRoute[] _patrolRoutes;
         [SerializeField] private bool _switchRouteWhenFinished = true;
         [SerializeField] private float _waitAtWaypointTime = 1f;
 
@@ -131,6 +133,7 @@ namespace Enemy
             SetPathToCurrentWaypoint();
 
             _enemyController.ChangeState(EnemyState.Patrol);
+            _enemyController.DetectionController.ResetDetectionRange();
         }
 
         private void FollowPath(float speed)
