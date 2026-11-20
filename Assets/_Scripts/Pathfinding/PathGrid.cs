@@ -93,9 +93,9 @@ namespace Pathfinding
             return node;
         }
 
-        public List<PathNode> GetNeighbours(PathNode node)
+        public List<PathNode> GetNeighbours(PathNode node, List<PathNode> neighbours)
         {
-            List<PathNode> neighbours = new List<PathNode>();
+            neighbours.Clear();
 
             AddNeighbour(neighbours, node.CellPosition, new Vector3Int(1, 0, 0));
             AddNeighbour(neighbours, node.CellPosition, new Vector3Int(-1, 0, 0));

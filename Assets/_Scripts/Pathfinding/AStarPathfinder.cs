@@ -7,6 +7,8 @@ namespace Pathfinding
     {
         [SerializeField] private PathGrid _pathGrid;
 
+        private readonly List<PathNode> _neighbours = new List<PathNode>();
+        
         public List<Vector3> FindPath(Vector3 startWorldPosition, Vector3 targetWorldPosition)
         {
             var startNode = _pathGrid.GetNodeFromWorldPosition(startWorldPosition);
@@ -37,8 +39,10 @@ namespace Pathfinding
 
                 openSet.Remove(currentNode);
                 closedSet.Add(currentNode);
+                
+                _pathGrid.GetNeighbours(currentNode, _neighbours);
 
-                foreach (var neighbour in _pathGrid.GetNeighbours(currentNode))
+                foreach (var neighbour in _neighbours)
                 {
                     if (closedSet.Contains(neighbour))
                         continue;
@@ -100,7 +104,9 @@ namespace Pathfinding
                 openSet.Remove(currentNode);
                 closedSet.Add(currentNode);
 
-                foreach (var neighbour in _pathGrid.GetNeighbours(currentNode))
+                _pathGrid.GetNeighbours(currentNode, _neighbours);
+                
+                foreach (var neighbour in _neighbours)
                 {
                     if (closedSet.Contains(neighbour))
                         continue;

@@ -8,25 +8,25 @@ namespace Enemy
 {
     public class EnemyMovementController : MonoBehaviour
     {
-        [Header("References")]
+        [Header("References")] 
         [SerializeField] private AStarPathfinder _pathfinder;
-        
-        [Header("Pathfinding")]
+
+        [Header("Pathfinding")] 
         [SerializeField] private float _nextPathPointDistance = 0.2f;
-        
-        [Header("Chase")]
+
+        [Header("Chase")] 
         [SerializeField] private float _repathInterval = 0.3f;
         [SerializeField] private float _pathTargetDistance = 0.45f;
-        
-        [Header("Patrol")]
+
+        [Header("Patrol")] 
         [SerializeField] private PatrolRoute[] _patrolRoutes;
         [SerializeField] private bool _switchRouteWhenFinished = true;
         [SerializeField] private float _waitAtWaypointTime = 1f;
-        
+
         private EnemyController _enemyController;
         private PatrolRoute _currentRoute;
         private int _currentWaypointIndex;
-        
+
         private readonly List<Vector3> _path = new();
         private int _pathIndex;
         private float _repathTimer;
@@ -39,6 +39,17 @@ namespace Enemy
 
         private void Update()
         {
+            if (_enemyController.IsDead)
+            {
+                return;
+            }
+
+            if (!_enemyController.CanMove)
+            {
+                StopMoving();
+                return;
+            }
+
             if (_enemyController.CurrentState == EnemyState.Chase && _enemyController.Target != null)
             {
                 _repathTimer -= Time.deltaTime;
@@ -49,11 +60,10 @@ namespace Enemy
                     _repathTimer = _repathInterval;
                 }
 
-                var distanceToTarget = Vector2.Distance(transform.position, _enemyController.Target .position);
+                var distanceToTarget = Vector2.Distance(transform.position, _enemyController.Target.position);
 
                 if (distanceToTarget <= _enemyController.AttackRange)
                 {
-                    _enemyController.Animator.SetBool(Utils.IS_ATTACKING_HASH, true);
                     _enemyController.ChangeState(EnemyState.Attack);
                 }
             }
@@ -80,9 +90,20 @@ namespace Enemy
                 GoToNextWaypoint();
             }
         }
-        
+
         private void FixedUpdate()
         {
+            if (_enemyController.IsDead)
+            {
+                return;
+            }
+            
+            if (!_enemyController.CanMove)
+            {
+                StopMoving();
+                return;
+            }
+
             switch (_enemyController.CurrentState)
             {
                 case EnemyState.Idle:
@@ -112,21 +133,14 @@ namespace Enemy
             SetPathToCurrentWaypoint();
 
             _enemyController.ChangeState(EnemyState.Patrol);
+            _enemyController.DetectionController.ResetDetectionRange();
         }
-        
+
         private void FollowPath(float speed)
         {
             if (_path.Count == 0 || _pathIndex >= _path.Count)
             {
-                if (_enemyController.CurrentState == EnemyState.Chase)
-                {
-                    RefreshPathToTarget();
-                }
-                else
-                {
-                    _path.Clear();
-                }
-
+                _path.Clear();
                 StopMoving();
                 return;
             }
@@ -135,17 +149,12 @@ namespace Enemy
             var currentPosition = _enemyController.Rigidbody.position;
             var direction = targetPoint - currentPosition;
 
-            if (direction.magnitude <= _nextPathPointDistance)
+            if (direction.sqrMagnitude <= _nextPathPointDistance * _nextPathPointDistance)
             {
                 _pathIndex++;
 
                 if (_pathIndex >= _path.Count)
                 {
-                    if (_enemyController.CurrentState == EnemyState.Chase)
-                    {
-                        RefreshPathToTarget();
-                    }
-
                     StopMoving();
                     return;
                 }
@@ -159,7 +168,7 @@ namespace Enemy
             _enemyController.Rigidbody.linearVelocity = direction * speed;
             _enemyController.UpdateAnimation(direction, speed);
         }
-        
+
         private void GoToNextWaypoint()
         {
             _waitTimer = _waitAtWaypointTime;
@@ -185,7 +194,7 @@ namespace Enemy
 
             SetPathToCurrentWaypoint();
         }
-        
+
         private void SetPathToCurrentWaypoint()
         {
             if (!_currentRoute || _currentRoute.Count == 0)
@@ -211,17 +220,17 @@ namespace Enemy
             _path.AddRange(newPath);
             _pathIndex = _path.Count > 1 ? 1 : 0;
         }
-        
+
         private void RefreshPathToTarget()
         {
-            if (!_enemyController.Target )
+            if (!_enemyController.Target)
             {
                 return;
             }
 
             var newPath = _pathfinder.FindPathNearTarget(
                 transform.position,
-                _enemyController.Target .position,
+                _enemyController.Target.position,
                 _pathTargetDistance
             );
 
@@ -241,24 +250,14 @@ namespace Enemy
             _enemyController.Animator.SetFloat(Utils.SPEED_HASH, 0f);
         }
 
-        private void OnTriggerEnter2D(Collider2D other)
+        public void FoundTarget()
         {
-            if (!other.CompareTag("Player"))
-            {
-                return;
-            }
-            
             RefreshPathToTarget();
             _repathTimer = _repathInterval;
         }
 
-        private void OnTriggerExit2D(Collider2D other)
+        public void LostTarget()
         {
-            if (!other.CompareTag("Player"))
-            {
-                return;
-            }
-
             _path.Clear();
             StartPatrol();
         }

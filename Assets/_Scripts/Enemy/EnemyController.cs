@@ -1,33 +1,46 @@
 using System;
 using System.Collections.Generic;
+using Combat;
+using DG.Tweening;
 using Pathfinding;
 using Player;
+using UI;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace Enemy
 {
-    public class EnemyController : MonoBehaviour
+    public class EnemyController : AnimationEventsListener, IDamageable
     {
+        private const float DAMAGE_FLASH_DURATION = 0.3f;
+        private const float DETECTION_RANGE_INCREASE_AMOUNT = 1f;
+
         public EnemyState CurrentState => _currentState;
         public Rigidbody2D Rigidbody => _rb;
         public Animator Animator => _animator;
+        public EnemyDetectionController DetectionController => _detectionController;
         public float AttackRange => _attackRange;
         public Transform Target => _target;
         public float RunSpeed => _runSpeed;
         public float WalkSpeed => _walkSpeed;
-        
+        public bool IsAttackLocked => _isAttacking;
+        public bool CanMove => _canMove;
+        public bool IsDead => _isDead;
+        public bool LostTargetDuringAttack { get; set; }
+
         [Header("References")]
         [SerializeField] private Animator _animator;
         [SerializeField] private SpriteRenderer _spriteRenderer;
+        [SerializeField] private Transform _attackHitbox;
+        [SerializeField] private Collider2D _attackHitboxCollider;
+        [SerializeField] private UIHealthController _uiHealthController;
+        [SerializeField] private EnemyDetectionController _detectionController;
         
         [Header("Stats")]
+        [SerializeField] private float _maxHealth = 30f;
+        [SerializeField] private float _health = 30f;
         [SerializeField] private float _runSpeed = 1.5f;
         [SerializeField] private float _walkSpeed = 0.5f;
-        [SerializeField] private float _detectionRange = 1f;
-        [SerializeField] private CircleCollider2D _detectionCollider;
-        [SerializeField] private float _damage = 10;
-        [SerializeField] private float _attackSpeed = 1f;
         [SerializeField] private float _attackRange = 0.3f;
 
         private EnemyState _currentState = EnemyState.Idle;
@@ -35,9 +48,11 @@ namespace Enemy
         private EnemyMovementController _enemyMovementController;
         private Transform _target;
         private PlayerController _playerController;
-        private Vector2 _lastMoveDirection = Vector2.down;
-        
-        private float _attackTimer;
+        private Vector2 _lastFacingDirection = Vector2.down;
+        private Tween _damageFlashTween;
+        private bool _isAttacking;
+        private bool _canMove;
+        private bool _isDead;
 
         private void Awake()
         {
@@ -48,28 +63,28 @@ namespace Enemy
         private void Start()
         {
             _enemyMovementController.StartPatrol();
-            _detectionCollider.radius = _detectionRange;
-            _attackTimer = 1f / _attackSpeed;
+            _attackHitbox.gameObject.SetActive(false);
+            _canMove = true;
         }
 
         private void Update()
         {
-            _spriteRenderer.sortingOrder = Mathf.RoundToInt(-transform.position.y * 100);
-            
-            if (_currentState == EnemyState.Attack && _target != null)
+            if (_isDead)
             {
-                var distanceToTarget = Vector2.Distance(transform.position, _target.position);
-
-                if (distanceToTarget > _attackRange)
-                {
-                    ChangeState(EnemyState.Chase);
-                    _animator.SetBool(Utils.IS_ATTACKING_HASH, false);
-                }
+                return;
             }
+
+            //This is a rule used by all the sprites in the project to add depth and help with sorting
+            _spriteRenderer.sortingOrder = Mathf.RoundToInt(-transform.position.y * 100);
         }
 
         private void FixedUpdate()
         {
+            if (_isDead)
+            {
+                return;
+            }
+
             switch (_currentState)
             {
                 case EnemyState.Attack:
@@ -83,24 +98,95 @@ namespace Enemy
         {
             if (!_playerController)
             {
+                _isAttacking = false;
+                _canMove = true;
                 ChangeState(EnemyState.Chase);
-                _animator.SetBool(Utils.IS_ATTACKING_HASH, false);
-                return;
-            }
-
-            _attackTimer -= Time.fixedDeltaTime;
-
-            if (_attackTimer > 0f)
-            {
+                _animator.SetBool(Utils.IS_ATTACKING_HASH, _isAttacking);
                 return;
             }
             
-            _playerController.TakeDamage(_damage);
-            _attackTimer = 1f / _attackSpeed;
+            if (_isAttacking)
+            {
+                return;
+            }
+
+            if (_playerController.IsDead)
+            {
+                _isAttacking = false;
+                _canMove = true;
+                _enemyMovementController.LostTarget();
+                _animator.SetBool(Utils.IS_ATTACKING_HASH, _isAttacking);
+                return;
+            }
+            
+            _isAttacking = true;
+            _canMove = false;
+            _animator.SetBool(Utils.IS_ATTACKING_HASH, _isAttacking);
+            _animator.Play(Utils.ATTACK_STATE_NAME, 0, 0f);
+        }
+        
+        public override void EnableAttackHitbox()
+        {
+            PositionAttackHitbox();
+            _attackHitbox.gameObject.SetActive(true);
+        }
+        
+        public override void DisableAttackHitbox()
+        {
+            _attackHitbox.gameObject.SetActive(false);
+        }
+        
+        private void PositionAttackHitbox()
+        {
+            if (!_attackHitbox)
+            {
+                return;
+            }
+
+            var attackDirection = _lastFacingDirection;
+
+            if (attackDirection.sqrMagnitude < 0.01f)
+            {
+                attackDirection = Vector2.down;
+            }
+
+            attackDirection.Normalize();
+
+            var angle = Mathf.Atan2(attackDirection.y, attackDirection.x) * Mathf.Rad2Deg;
+            _attackHitbox.localRotation = Quaternion.Euler(0f, 0f, angle);
+        }
+        
+        public override void FinishAttack()
+        {
+            _isAttacking = false;
+            _canMove = true;
+            _animator.SetBool(Utils.IS_ATTACKING_HASH, _isAttacking);
+            
+            _enemyMovementController.StopMoving();
+            
+            if (!_target || !_playerController || LostTargetDuringAttack || _playerController && _playerController.IsDead)
+            {
+                ClearTarget();
+                _enemyMovementController.LostTarget();
+                return;
+            }
+
+            var distanceToTarget = Vector2.Distance(transform.position, _target.position);
+
+            if (distanceToTarget > _attackRange)
+            {
+                ChangeState(EnemyState.Chase);
+                _animator.SetBool(Utils.IS_ATTACKING_HASH, false);
+            }
         }
 
         public void ChangeState(EnemyState newState)
         {
+            if (IsAttackLocked && newState != EnemyState.Attack)
+            {
+                return;
+            }
+
             _currentState = newState;
         }
         
@@ -108,10 +194,10 @@ namespace Enemy
         {
             if (direction.sqrMagnitude > 0.01f)
             {
-                _lastMoveDirection = ConvertToEightDirection(direction);
+                _lastFacingDirection = ConvertToEightDirection(direction);
 
-                _animator.SetFloat(Utils.MOVE_X_HASH, _lastMoveDirection.x);
-                _animator.SetFloat(Utils.MOVE_Y_HASH, _lastMoveDirection.y);
+                _animator.SetFloat(Utils.MOVE_X_HASH, _lastFacingDirection.x);
+                _animator.SetFloat(Utils.MOVE_Y_HASH, _lastFacingDirection.y);
             }
 
             _animator.SetFloat(Utils.SPEED_HASH, speed);
@@ -165,28 +251,57 @@ namespace Enemy
             return new Vector2(0, 0);
         }
 
-        private void OnTriggerEnter2D(Collider2D other)
+        public void SetTarget(PlayerController newTarget)
         {
-            if (!other.CompareTag("Player"))
-            {
-                return;
-            }
-
-            _target = other.transform;
-            _playerController = other.GetComponent<PlayerController>();
-            _currentState = EnemyState.Chase;
+            _target = newTarget.transform;
+            _playerController = newTarget;
         }
 
-        private void OnTriggerExit2D(Collider2D other)
+        public void ClearTarget()
         {
-            if (!other.CompareTag("Player"))
-            {
-                return;
-            }
-
             _target = null;
             _playerController = null;
-            _rb.linearVelocity = Vector2.zero;
+            LostTargetDuringAttack = false;
+        }
+
+        public void TakeDamage(float amount)
+        {
+            _health -= amount;
+
+            if (_health <= 0)
+            {
+                Die();
+                return;
+            }
+            
+            _damageFlashTween?.Kill();
+            _spriteRenderer.color = Color.white;
+
+            _damageFlashTween = _spriteRenderer
+                .DOColor(Color.red, DAMAGE_FLASH_DURATION)
+                .SetLoops(2, LoopType.Yoyo);
+            _uiHealthController.UpdateHealth(_health, _maxHealth);
+            
+            _detectionController.IncreaseDetectionRange(DETECTION_RANGE_INCREASE_AMOUNT);
+            
+            _canMove = false;
+            _animator.SetBool(Utils.TAKE_DAMAGE_HASH, true);
+        }
+        
+        public override void EndHurt()
+        {
+            _canMove = true;
+            _animator.SetBool(Utils.TAKE_DAMAGE_HASH, false);
+        }
+
+        public void Die()
+        {
+            _isDead = true;
+            _animator.SetTrigger(Utils.DIE_HASH);
+            _uiHealthController.gameObject.SetActive(false);
+            gameObject.tag = "Dead";
+            GetComponent<CapsuleCollider2D>().enabled = false;
+            _rb.constraints = RigidbodyConstraints2D.FreezeAll;
         }
     }
 }
