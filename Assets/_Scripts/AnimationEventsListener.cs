@@ -1,20 +1,13 @@
 using UnityEngine;
 
 
-public class AnimationEventsListener : MonoBehaviour
+public abstract class AnimationEventsListener : MonoBehaviour
 {
-    public virtual void FinishAttack()
-    {
-        
-    }
+    public abstract void FinishAttack();
 
-    public virtual void EnableAttackHitbox()
-    {
-        
-    }
+    public abstract void EnableAttackHitbox();
 
-    public virtual void DisableAttackHitbox()
-    {
-        
-    }
+    public abstract void DisableAttackHitbox();
+
+    public abstract void EndHurt();
 }

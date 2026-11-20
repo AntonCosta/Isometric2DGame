@@ -37,6 +37,11 @@ namespace Enemy
 
         private void Update()
         {
+            if (_enemyController.IsDead)
+            {
+                return;
+            }
+
             if (!_enemyController.CanMove)
             {
                 StopMoving();
@@ -86,6 +91,11 @@ namespace Enemy
 
         private void FixedUpdate()
         {
+            if (_enemyController.IsDead)
+            {
+                return;
+            }
+            
             if (!_enemyController.CanMove)
             {
                 StopMoving();
@@ -127,15 +137,7 @@ namespace Enemy
         {
             if (_path.Count == 0 || _pathIndex >= _path.Count)
             {
-                if (_enemyController.CurrentState == EnemyState.Chase)
-                {
-                    RefreshPathToTarget();
-                }
-                else
-                {
-                    _path.Clear();
-                }
-
+                _path.Clear();
                 StopMoving();
                 return;
             }
@@ -144,17 +146,12 @@ namespace Enemy
             var currentPosition = _enemyController.Rigidbody.position;
             var direction = targetPoint - currentPosition;
 
-            if (direction.magnitude <= _nextPathPointDistance)
+            if (direction.sqrMagnitude <= _nextPathPointDistance * _nextPathPointDistance)
             {
                 _pathIndex++;
 
                 if (_pathIndex >= _path.Count)
                 {
-                    if (_enemyController.CurrentState == EnemyState.Chase)
-                    {
-                        RefreshPathToTarget();
-                    }
-
                     StopMoving();
                     return;
                 }

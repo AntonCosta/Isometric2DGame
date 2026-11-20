@@ -22,7 +22,8 @@ namespace Enemy
         public float RunSpeed => _runSpeed;
         public float WalkSpeed => _walkSpeed;
         public bool IsAttackLocked => _isAttacking;
-        public bool CanMove => !_isAttacking;
+        public bool CanMove => _canMove;
+        public bool IsDead => _isDead;
         public bool LostTargetDuringAttack { get; set; }
 
         [Header("References")]
@@ -33,8 +34,8 @@ namespace Enemy
         [SerializeField] private UIHealthController _uiHealthController;
         
         [Header("Stats")]
-        [SerializeField] private float _maxHealth = 100f;
-        [SerializeField] private float _health = 100f;
+        [SerializeField] private float _maxHealth = 30f;
+        [SerializeField] private float _health = 30f;
         [SerializeField] private float _runSpeed = 1.5f;
         [SerializeField] private float _walkSpeed = 0.5f;
         [SerializeField] private float _attackRange = 0.3f;
@@ -47,6 +48,8 @@ namespace Enemy
         private Vector2 _lastFacingDirection = Vector2.down;
         private Tween _damageFlashTween;
         private bool _isAttacking;
+        private bool _canMove;
+        private bool _isDead;
 
         private void Awake()
         {
@@ -58,15 +61,27 @@ namespace Enemy
         {
             _enemyMovementController.StartPatrol();
             _attackHitbox.gameObject.SetActive(false);
+            _canMove = true;
         }
 
         private void Update()
         {
+            if (_isDead)
+            {
+                return;
+            }
+
+            //This is a rule used by all the sprites in the project to add depth and help with sorting
             _spriteRenderer.sortingOrder = Mathf.RoundToInt(-transform.position.y * 100);
         }
 
         private void FixedUpdate()
         {
+            if (_isDead)
+            {
+                return;
+            }
+
             switch (_currentState)
             {
                 case EnemyState.Attack:
@@ -81,6 +96,7 @@ namespace Enemy
             if (!_playerController)
             {
                 _isAttacking = false;
+                _canMove = true;
                 ChangeState(EnemyState.Chase);
                 _animator.SetBool(Utils.IS_ATTACKING_HASH, _isAttacking);
                 return;
@@ -90,8 +106,18 @@ namespace Enemy
             {
                 return;
             }
+
+            if (_playerController.IsDead)
+            {
+                _isAttacking = false;
+                _canMove = true;
+                _enemyMovementController.LostTarget();
+                _animator.SetBool(Utils.IS_ATTACKING_HASH, _isAttacking);
+                return;
+            }
             
             _isAttacking = true;
+            _canMove = false;
             _animator.SetBool(Utils.IS_ATTACKING_HASH, _isAttacking);
             _animator.Play(Utils.ATTACK_STATE_NAME, 0, 0f);
         }
@@ -130,11 +156,12 @@ namespace Enemy
         public override void FinishAttack()
         {
             _isAttacking = false;
+            _canMove = true;
             _animator.SetBool(Utils.IS_ATTACKING_HASH, _isAttacking);
             
             _enemyMovementController.StopMoving();
             
-            if (!_target || !_playerController || LostTargetDuringAttack)
+            if (!_target || !_playerController || LostTargetDuringAttack || _playerController && _playerController.IsDead)
             {
                 ClearTarget();
                 _enemyMovementController.LostTarget();
@@ -237,6 +264,13 @@ namespace Enemy
         public void TakeDamage(float amount)
         {
             _health -= amount;
+
+            if (_health <= 0)
+            {
+                Die();
+                return;
+            }
+            
             _damageFlashTween?.Kill();
             _spriteRenderer.color = Color.white;
 
@@ -244,6 +278,25 @@ namespace Enemy
                 .DOColor(Color.red, DAMAGE_FLASH_DURATION)
                 .SetLoops(2, LoopType.Yoyo);
             _uiHealthController.UpdateHealth(_health, _maxHealth);
+            
+            _canMove = false;
+            _animator.SetBool(Utils.TAKE_DAMAGE_HASH, true);
+        }
+        
+        public override void EndHurt()
+        {
+            _canMove = true;
+            _animator.SetBool(Utils.TAKE_DAMAGE_HASH, false);
+        }
+
+        public void Die()
+        {
+            _isDead = true;
+            _animator.SetTrigger(Utils.DIE_HASH);
+            _uiHealthController.gameObject.SetActive(false);
+            gameObject.tag = "Dead";
+            GetComponent<CapsuleCollider2D>().enabled = false;
+            _rb.constraints = RigidbodyConstraints2D.FreezeAll;
         }
     }
 }

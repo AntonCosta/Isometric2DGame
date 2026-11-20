@@ -18,12 +18,23 @@ namespace Enemy
 
         private void OnTriggerEnter2D(Collider2D other)
         {
+            if (_enemyController.IsDead)
+            {
+                return;
+            }
+
             if (!other.CompareTag("Player"))
             {
                 return;
             }
 
             var playerController = other.GetComponent<PlayerController>();
+
+            if (!playerController || playerController.IsDead)
+            {
+                return;
+            }
+            
             _enemyController.SetTarget(playerController);
             _enemyController.ChangeState(EnemyState.Chase);
 
@@ -33,6 +44,11 @@ namespace Enemy
 
         private void OnTriggerExit2D(Collider2D other)
         {
+            if (_enemyController.IsDead)
+            {
+                return;
+            }
+
             if (!other.CompareTag("Player"))
             {
                 return;

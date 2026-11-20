@@ -19,4 +19,9 @@ public class AnimationEventRelay : MonoBehaviour
     {
         _listenerController.DisableAttackHitbox();
     }
+    
+    public void EndHurt()
+    {
+        _listenerController.EndHurt();
+    }
 }
