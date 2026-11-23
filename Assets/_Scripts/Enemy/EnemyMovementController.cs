@@ -16,7 +16,7 @@ namespace Enemy
 
         [Header("Chase")] 
         [SerializeField] private float _repathInterval = 0.3f;
-        [SerializeField] private float _pathTargetDistance = 0.45f;
+        [SerializeField] private float _pathTargetDistance = 0.15f;
 
         [Header("Patrol")] 
         [SerializeField] private PatrolRoute[] _patrolRoutes;

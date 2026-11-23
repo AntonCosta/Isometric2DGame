@@ -7,14 +7,17 @@ namespace Dialogue
 {
     public class DialogueManager : MonoBehaviour
     {
+        public bool DialogueOpen => _dialogueOpen;
+        
         [SerializeField] private DialogueBoxController _dialogueBoxController;
         
-        private List<DialogueModel> _dialogueModels => _dialogues.Dialogues;
-        private List<ResponseModel> _responseModels => _responses.Responses;
+        private List<DialogueModel> DialogueModels => _dialogues.Dialogues;
+        private List<ResponseModel> ResponseModels => _responses.Responses;
         private DialogueListModel _dialogues = new ();
         private ResponseListModel _responses = new ();
         
         private int _currentDialogueId;
+        private bool _dialogueOpen;
 
         private void Awake()
         {
@@ -31,28 +34,34 @@ namespace Dialogue
 
         public void StartDialogue(int dialogueId, string speaker)
         {
+            _dialogueBoxController.StartDialogue();
             _dialogueBoxController.SetDialogueSpeaker(speaker);
             _dialogueBoxController.SetDialogueText(GetDialogueText(dialogueId));
             _currentDialogueId = dialogueId;
+            _dialogueOpen = true;
         }
 
         public string GetDialogueText(int dialogueId)
         {
-            return _dialogueModels.Find(dialogue => dialogue.Id == dialogueId).Text;
+            return DialogueModels.Find(dialogue => dialogue.Id == dialogueId).Text;
         }
         
         public List<int> GetDialogueResponses(int dialogueId)
         {
-            return _dialogueModels.Find(dialogue => dialogue.Id == dialogueId).PossibleResponse;
+            return DialogueModels.Find(dialogue => dialogue.Id == dialogueId).PossibleResponse;
         }
 
         public DialogueModel GetDialogueById(int dialogueId)
         {
-            return _dialogueModels.Find(dialogue => dialogue.Id == dialogueId);
+            return DialogueModels.Find(dialogue => dialogue.Id == dialogueId);
         }
 
         public void NextDialogueLine(int nextId)
         {
+            if (nextId == 0)
+            {
+                EndDialogue();
+            }
             _dialogueBoxController.SetDialogueText(GetDialogueText(nextId));
             _currentDialogueId = nextId;
         }
@@ -61,7 +70,7 @@ namespace Dialogue
         {
             var responses = new List<ResponseModel>();
             var responseIds = GetDialogueResponses(_currentDialogueId);
-            _responseModels.ForEach(response =>
+            ResponseModels.ForEach(response =>
             {
                 if (responseIds.Contains(response.Id))
                 {
@@ -69,6 +78,16 @@ namespace Dialogue
                 }
             });
             _dialogueBoxController.SetDialogueResponses(responses);
+        }
+
+        public void EndDialogue()
+        {
+            _dialogueBoxController.EndDialogue();
+        }
+
+        public void CloseDialogue()
+        {
+            _dialogueOpen = false;
         }
     }
 }

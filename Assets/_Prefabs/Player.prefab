@@ -236,12 +236,13 @@ MonoBehaviour:
   _autoAttackUI: {fileID: 0}
   _healUI: {fileID: 0}
   _healFX: {fileID: 2497174513660011463}
+  _dialogueManager: {fileID: 0}
   _maxHealth: 100
   _health: 100
   _moveSpeed: 3
   _acceleration: 0
   _autoAttackSpeed: 1
-  _healUses: 1
+  _healUses: 5
   _projectilePool: {fileID: 0}
 --- !u!50 &7874564886125565632
 Rigidbody2D:

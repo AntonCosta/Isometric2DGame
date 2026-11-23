@@ -7,7 +7,7 @@ namespace Pathfinding
     {
         [SerializeField] private PathGrid _pathGrid;
 
-        private readonly List<PathNode> _neighbours = new List<PathNode>();
+        private readonly List<PathNode> _neighbours = new();
         
         public List<Vector3> FindPath(Vector3 startWorldPosition, Vector3 targetWorldPosition)
         {
@@ -15,10 +15,14 @@ namespace Pathfinding
             var targetNode = _pathGrid.GetNodeFromWorldPosition(targetWorldPosition);
 
             if (startNode == null || targetNode == null)
+            {
                 return null;
+            }
 
             if (!startNode.Walkable || !targetNode.Walkable)
+            {
                 return null;
+            }
 
             _pathGrid.ResetNodes();
 
@@ -35,7 +39,9 @@ namespace Pathfinding
                 var currentNode = GetLowestFCostNode(openSet);
 
                 if (currentNode == targetNode)
+                {
                     return BuildWorldPath(targetNode);
+                }
 
                 openSet.Remove(currentNode);
                 closedSet.Add(currentNode);
@@ -45,9 +51,11 @@ namespace Pathfinding
                 foreach (var neighbour in _neighbours)
                 {
                     if (closedSet.Contains(neighbour))
+                    {
                         continue;
+                    }
 
-                    int tentativeGCost = currentNode.GCost + GetDistanceCost(currentNode, neighbour);
+                    var tentativeGCost = currentNode.GCost + GetDistanceCost(currentNode, neighbour);
 
                     if (tentativeGCost < neighbour.GCost)
                     {
@@ -56,7 +64,9 @@ namespace Pathfinding
                         neighbour.HCost = GetDistanceCost(neighbour, targetNode);
 
                         if (!openSet.Contains(neighbour))
+                        {
                             openSet.Add(neighbour);
+                        }
                     }
                 }
             }
@@ -69,7 +79,9 @@ namespace Pathfinding
             var startNode = _pathGrid.GetNodeFromWorldPosition(startWorldPosition);
 
             if (startNode == null || !startNode.Walkable)
+            {
                 return null;
+            }
 
             _pathGrid.ResetNodes();
 
@@ -109,7 +121,9 @@ namespace Pathfinding
                 foreach (var neighbour in _neighbours)
                 {
                     if (closedSet.Contains(neighbour))
+                    {
                         continue;
+                    }
 
                     var tentativeGCost = currentNode.GCost + GetDistanceCost(currentNode, neighbour);
 

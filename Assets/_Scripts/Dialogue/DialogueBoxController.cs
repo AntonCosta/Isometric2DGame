@@ -16,17 +16,21 @@ namespace Dialogue
         [SerializeField] private float _typingSpeed = 0.05f;
         [SerializeField] private TextMeshProUGUI _dialogueSpeaker;
         [SerializeField] private TextMeshProUGUI _dialogueText;
-        [SerializeField] private List<TextMeshProUGUI> _dialogueResponses;
+        [SerializeField] private List<ResponseController> _dialogueResponses;
 
         private string _fullText;
         private Coroutine _typingCoroutine;
         private bool _isTyping;
         private InputAction _skipAction;
+        private bool _canClose;
+        private bool _dialogueOpen;
 
         private void Awake()
         {
             _dialogueSpeaker.text = "";
             _dialogueText.text = "";
+            _dialogueResponses.ForEach(response => response.gameObject.SetActive(false));
+            EndDialogue();
         }
 
         private void Start()
@@ -36,10 +40,17 @@ namespace Dialogue
 
         private void Update()
         {
-            if (_skipAction.WasPressedThisFrame() && _isTyping)
+            if (_skipAction.WasPressedThisFrame())
             {
-               SkipDialogue();
-            }
+                if (_isTyping)
+                {
+                    SkipDialogue();
+                }
+                else if (_canClose)
+                {
+                    EndDialogue();
+                }
+            }  
         }
 
         public void StartDialogue()
@@ -50,6 +61,7 @@ namespace Dialogue
         public void EndDialogue()
         {
             _dialogueHolder.SetActive(false);
+            _dialogueManager.CloseDialogue();
         }
 
         public void SetDialogueSpeaker(string text)
@@ -59,6 +71,12 @@ namespace Dialogue
 
         public void SetDialogueText(string text)
         {
+            _dialogueResponses.ForEach(response =>
+            {
+                response.ClearText();
+                response.gameObject.SetActive(false);
+            });
+
             _fullText = text;
             if (_typingCoroutine != null)
             {
@@ -70,11 +88,13 @@ namespace Dialogue
         
         public void SetDialogueResponses(List<ResponseModel> possibleResponses)
         {
+            _canClose = possibleResponses.Count == 0;
             for (var i = 0; i < possibleResponses.Count; i++)
             {
-                _dialogueResponses[i].text = possibleResponses[i].Text;
+                _dialogueResponses[i].ResponseModel = possibleResponses[i];
+                _dialogueResponses[i].SetText();
             }
-            _dialogueResponses.ForEach(response => response.gameObject.SetActive(response.text != ""));
+            _dialogueResponses.ForEach(response => response.gameObject.SetActive(response.ResponseText != ""));
         }
 
         private IEnumerator TypeText()
@@ -103,11 +123,6 @@ namespace Dialogue
                 _typingCoroutine = null;
                 OnTextWritten?.Invoke();
             }
-        }
-
-        public void OnResponsePressed(int nextId)
-        {
-            
         }
     }
 }

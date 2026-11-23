@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace Dialogue
 {
+    [Serializable]
     public class DialogueListModel
     {
         public List<DialogueModel> Dialogues;
