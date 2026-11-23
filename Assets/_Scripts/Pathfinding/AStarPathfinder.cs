@@ -182,15 +182,11 @@ namespace Pathfinding
         {
             var lowestNode = nodes[0];
 
-            for (int i = 1; i < nodes.Count; i++)
+            for (var i = 1; i < nodes.Count; i++)
             {
                 var node = nodes[i];
 
-                if (node.FCost < lowestNode.FCost)
-                {
-                    lowestNode = node;
-                }
-                else if (node.FCost == lowestNode.FCost && node.HCost < lowestNode.HCost)
+                if (node.FCost < lowestNode.FCost || node.FCost == lowestNode.FCost && node.HCost < lowestNode.HCost)
                 {
                     lowestNode = node;
                 }
