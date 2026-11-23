@@ -1,6 +1,7 @@
 using System;
 using Combat;
 using DG.Tweening;
+using Dialogue;
 using UI;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -26,6 +27,7 @@ namespace Player
         [SerializeField] private Image _autoAttackUI;
         [SerializeField] private Image _healUI;
         [SerializeField] private VFXController _healFX;
+        [SerializeField] private DialogueManager _dialogueManager;
 
         [Header("Stats")]
         [SerializeField] private float _maxHealth = 100f;
@@ -63,7 +65,7 @@ namespace Player
             _moveAction = InputSystem.actions.FindAction("Move");
             _attackAction = InputSystem.actions.FindAction("Attack");
             _autoAttackAction = InputSystem.actions.FindAction("AutoAttack");
-            _healAction = InputSystem.actions.FindAction("Interact");
+            _healAction = InputSystem.actions.FindAction("Heal");
             _attackHitbox.gameObject.SetActive(false);
             _autoAttackUI.color = Color.gray;
         }
@@ -71,6 +73,11 @@ namespace Player
         private void Update()
         {
             if (_isDead)
+            {
+                return;
+            }
+
+            if (_dialogueManager.DialogueOpen)
             {
                 return;
             }
@@ -113,6 +120,11 @@ namespace Player
 
         void FixedUpdate()
         {
+            if (_dialogueManager.DialogueOpen)
+            {
+                return;
+            }
+            
             if (_isAttacking)
             {
                 _rb.linearVelocity = Vector2.zero;
@@ -233,6 +245,7 @@ namespace Player
             GetComponent<CapsuleCollider2D>().enabled = false;
             _rb.constraints = RigidbodyConstraints2D.FreezeAll;
             OnPlayerDeath?.Invoke();
+            _dialogueManager.EndDialogue();
         }
 
         public override void EndHurt()

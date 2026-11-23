@@ -1,0 +1,29 @@
+{
+    "Responses": [
+        {
+            "Id": 1,
+            "Text": "Yes",
+            "NextDialogueId": 2
+        },
+        {
+            "Id": 2,
+            "Text": "No",
+            "NextDialogueId": 0
+        },
+        {
+            "Id": 3,
+            "Text": "Next",
+            "NextDialogueId": 3
+        },
+        {
+            "Id": 4,
+            "Text": "Previous",
+            "NextDialogueId": 1
+        },
+        {
+            "Id": 5,
+            "Text": "Continue",
+            "NextDialogueId": 4
+        }
+    ]
+}
