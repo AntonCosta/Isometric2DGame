@@ -63,10 +63,7 @@ namespace Dialogue.Editor
                 text = "Create Dialogue Node"
             };
             
-            var reloadButton = new Button(() =>
-            {
-                ReloadGraph();
-            })
+            var reloadButton = new Button(ReloadGraph)
             {
                 text = "Reload"
             };

@@ -230,50 +230,38 @@ namespace Dialogue.Editor
         
         private void CreateEdgesFromResponses()
         {
-            foreach (var sourceNode in _nodesByDialogueId.Values)
+            foreach (var outputPort in _nodesByDialogueId.Values.SelectMany(sourceNode => sourceNode.outputContainer.Children().OfType<Port>()))
             {
-                foreach (var outputPort in sourceNode.outputContainer.Children().OfType<Port>())
+                if (outputPort.userData is not ResponseModel response)
                 {
-                    if (outputPort.userData is not ResponseModel response)
-                    {
-                        continue;
-                    }
-
-                    if (response.NextDialogueId == 0)
-                    {
-                        continue;
-                    }
-
-                    if (!_nodesByDialogueId.TryGetValue(response.NextDialogueId, out var targetNode))
-                    {
-                        continue;
-                    }
-
-                    var inputPort = targetNode.inputContainer.Children().OfType<Port>().FirstOrDefault();
-
-                    if (inputPort == null)
-                    {
-                        continue;
-                    }
-
-                    var edge = outputPort.ConnectTo(inputPort);
-                    AddElement(edge);
+                    continue;
                 }
+
+                if (response.NextDialogueId == 0)
+                {
+                    continue;
+                }
+
+                if (!_nodesByDialogueId.TryGetValue(response.NextDialogueId, out var targetNode))
+                {
+                    continue;
+                }
+
+                var inputPort = targetNode.inputContainer.Children().OfType<Port>().FirstOrDefault();
+
+                if (inputPort == null)
+                {
+                    continue;
+                }
+
+                var edge = outputPort.ConnectTo(inputPort);
+                AddElement(edge);
             }
         }
         
-        private Port GeneratePort(
-            DialogueNodeView node,
-            Direction portDirection,
-            Port.Capacity capacity = Port.Capacity.Single
-        )
+        private Port GeneratePort(DialogueNodeView node, Direction portDirection, Port.Capacity capacity = Port.Capacity.Single)
         {
-            return node.InstantiatePort(
-                Orientation.Horizontal,
-                portDirection,
-                capacity,
-                typeof(float)
-            );
+            return node.InstantiatePort(Orientation.Horizontal, portDirection, capacity, typeof(float));
         }
         
         private void AddResponsePort(DialogueNodeView node, ResponseModel response)
@@ -375,12 +363,9 @@ namespace Dialogue.Editor
         {
             var nextId = 1;
 
-            foreach (var response in _responseData.Responses)
+            foreach (var response in _responseData.Responses.Where(response => response.Id >= nextId))
             {
-                if (response.Id >= nextId)
-                {
-                    nextId = response.Id + 1;
-                }
+                nextId = response.Id + 1;
             }
 
             return nextId;

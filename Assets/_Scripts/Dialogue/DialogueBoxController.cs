@@ -38,7 +38,7 @@ namespace Dialogue
 
         private void Start()
         {
-            _skipAction = InputSystem.actions.FindAction("Jump");
+            _skipAction = InputSystem.actions.FindAction(Utils.SKIP_DIALOGUE_ACTION);
         }
 
         private void Update()

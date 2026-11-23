@@ -3,6 +3,14 @@ using UnityEngine;
 public static class Utils
 {
     public const string ATTACK_STATE_NAME = "AttackingBlendTree";
+    public const string PLAYER_TAG = "Player";
+    public const string MOVE_ACTION = "Move";
+    public const string ATTACK_ACTION = "Attack";
+    public const string AUTO_ATTACK_ACTION = "AutoAttack";
+    public const string INTERACT_ACTION = "Interact";
+    public const string HEAL_ACTION = "Heal";
+    public const string SKIP_DIALOGUE_ACTION = "Jump";
+    
 
     private const string MOVE_X = "MoveX";
     private const string MOVE_Y = "MoveY";

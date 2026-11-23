@@ -15,8 +15,9 @@ namespace Enemy
         [SerializeField] private float _nextPathPointDistance = 0.2f;
 
         [Header("Chase")] 
-        [SerializeField] private float _repathInterval = 0.3f;
+        [SerializeField] private float _repathInterval = 0.5f;
         [SerializeField] private float _pathTargetDistance = 0.15f;
+        [SerializeField] private float _targetRepathMoveDistance = 0.5f;
 
         [Header("Patrol")] 
         [SerializeField] private PatrolRoute[] _patrolRoutes;
@@ -31,6 +32,8 @@ namespace Enemy
         private int _pathIndex;
         private float _repathTimer;
         private float _waitTimer;
+        private Vector3 _lastPathTargetPosition;
+        private bool _isStopped;
 
         private void Awake()
         {
@@ -52,19 +55,31 @@ namespace Enemy
 
             if (_enemyController.CurrentState == EnemyState.Chase && _enemyController.Target != null)
             {
+                var targetPosition = _enemyController.Target.position;
+                var position = transform.position;
+                var attackRange = _enemyController.AttackRange;
+                var distanceToTargetSqr = ((Vector2)(targetPosition - position)).sqrMagnitude;
+
+                if (distanceToTargetSqr <= attackRange * attackRange)
+                {
+                    _enemyController.ChangeState(EnemyState.Attack);
+                    return;
+                }
+                
                 _repathTimer -= Time.deltaTime;
 
                 if (_repathTimer <= 0f)
                 {
-                    RefreshPathToTarget();
+                    var targetMoveDistanceSqr = (targetPosition - _lastPathTargetPosition).sqrMagnitude;
+                    var repathMoveDistanceSqr = _targetRepathMoveDistance * _targetRepathMoveDistance;
+
+                    if (_path.Count == 0 || targetMoveDistanceSqr >= repathMoveDistanceSqr)
+                    {
+                        RefreshPathToTarget();
+                        _repathTimer = _repathInterval;
+                    }
+                    
                     _repathTimer = _repathInterval;
-                }
-
-                var distanceToTarget = Vector2.Distance(transform.position, _enemyController.Target.position);
-
-                if (distanceToTarget <= _enemyController.AttackRange)
-                {
-                    _enemyController.ChangeState(EnemyState.Attack);
                 }
             }
             else if (_enemyController.CurrentState == EnemyState.Patrol)
@@ -165,13 +180,14 @@ namespace Enemy
 
             direction.Normalize();
 
+            _isStopped = false;
+            _enemyController.Rigidbody.constraints = RigidbodyConstraints2D.FreezeRotation;
             _enemyController.Rigidbody.linearVelocity = direction * speed;
             _enemyController.UpdateAnimation(direction, speed);
         }
 
         private void GoToNextWaypoint()
         {
-            _waitTimer = _waitAtWaypointTime;
             _currentWaypointIndex++;
 
             if (_currentWaypointIndex >= _currentRoute.Count)
@@ -193,6 +209,7 @@ namespace Enemy
             }
 
             SetPathToCurrentWaypoint();
+            _waitTimer = _waitAtWaypointTime;
         }
 
         private void SetPathToCurrentWaypoint()
@@ -209,15 +226,13 @@ namespace Enemy
                 return;
             }
 
-            var newPath = _pathfinder.FindPath(transform.position, waypoint.position);
+            var pathFound = _pathfinder.FindPath(transform.position, waypoint.position, _path);
 
-            if (newPath == null || newPath.Count == 0)
+            if (!pathFound || _path.Count == 0)
             {
                 return;
             }
 
-            _path.Clear();
-            _path.AddRange(newPath);
             _pathIndex = _path.Count > 1 ? 1 : 0;
         }
 
@@ -228,32 +243,33 @@ namespace Enemy
                 return;
             }
 
-            var newPath = _pathfinder.FindPathNearTarget(
-                transform.position,
-                _enemyController.Target.position,
-                _pathTargetDistance
-            );
+            _lastPathTargetPosition = _enemyController.Target.position;
+            var pathFound = _pathfinder.FindPathNearTarget(transform.position, _enemyController.Target.position, _pathTargetDistance, _path);
 
-            if (newPath == null || newPath.Count == 0)
+            if (!pathFound || _path.Count == 0)
             {
                 return;
             }
 
-            _path.Clear();
-            _path.AddRange(newPath);
             _pathIndex = _path.Count > 1 ? 1 : 0;
         }
 
         public void StopMoving()
         {
+            if (_isStopped)
+            {
+                return;
+            }
+
+            _isStopped = true;
             _enemyController.Rigidbody.linearVelocity = Vector2.zero;
+            _enemyController.Rigidbody.constraints = RigidbodyConstraints2D.FreezeAll;
             _enemyController.Animator.SetFloat(Utils.SPEED_HASH, 0f);
         }
 
         public void FoundTarget()
         {
-            RefreshPathToTarget();
-            _repathTimer = _repathInterval;
+            _repathTimer = Random.Range(0f, _repathInterval);//stagger repathing
         }
 
         public void LostTarget()

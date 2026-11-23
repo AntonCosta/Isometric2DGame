@@ -12,6 +12,7 @@ namespace Player
     public class PlayerController : AnimationEventsListener, IDamageable
     {
         private const float DAMAGE_FLASH_DURATION = 0.3f;
+        private const float HEAL_VALUE = 25f;
 
         public Action OnPlayerDeath;
         public float AutoAttackSpeed => _autoAttackSpeed;
@@ -62,10 +63,10 @@ namespace Player
 
        private void Start()
         {
-            _moveAction = InputSystem.actions.FindAction("Move");
-            _attackAction = InputSystem.actions.FindAction("Attack");
-            _autoAttackAction = InputSystem.actions.FindAction("AutoAttack");
-            _healAction = InputSystem.actions.FindAction("Heal");
+            _moveAction = InputSystem.actions.FindAction(Utils.MOVE_ACTION);
+            _attackAction = InputSystem.actions.FindAction(Utils.ATTACK_ACTION);
+            _autoAttackAction = InputSystem.actions.FindAction(Utils.AUTO_ATTACK_ACTION);
+            _healAction = InputSystem.actions.FindAction(Utils.HEAL_ACTION);
             _attackHitbox.gameObject.SetActive(false);
             _autoAttackUI.color = Color.gray;
         }
@@ -108,7 +109,7 @@ namespace Player
                 _autoAttackUI.color = _canAutoAttack ? Color.white : Color.gray;
             }
 
-            if (_healAction.WasPressedThisFrame() && _healUses > _healedCounter)
+            if (_healAction.WasPressedThisFrame() && _healUses > _healedCounter && _health < _maxHealth)
             {
                 _healedCounter++;
                 Heal();
@@ -211,12 +212,12 @@ namespace Player
         private void Heal()
         {
             _healFX.Play();
-            _health += 25;
+            _health = Mathf.Clamp(_health + HEAL_VALUE, 0, _maxHealth);
             _uiHealthController.UpdateHealth(_health, _maxHealth);
             _healUI.fillAmount = 1f - _healedCounter / _healUses;
         }
 
-        public void TakeDamage(float amount)
+        public void TakeDamage(float amount, bool stun = true)
         {
             _health -= amount;
             

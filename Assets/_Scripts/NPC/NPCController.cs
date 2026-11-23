@@ -19,7 +19,7 @@ namespace NPC
 
         private void Start()
         {
-            _interactAction = InputSystem.actions.FindAction("Interact");
+            _interactAction = InputSystem.actions.FindAction(Utils.INTERACT_ACTION);
         }
 
         public void OnInteract()
@@ -53,7 +53,7 @@ namespace NPC
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            if (other.CompareTag("Player"))
+            if (other.CompareTag(Utils.PLAYER_TAG))
             {
                 _playerInRange = true;
                 _playerTransform = other.transform;
@@ -63,7 +63,7 @@ namespace NPC
         
         private void OnTriggerExit2D(Collider2D other)
         {
-            if (other.CompareTag("Player"))
+            if (other.CompareTag(Utils.PLAYER_TAG))
             {
                 _playerInRange = false;
                 _playerTransform = null;

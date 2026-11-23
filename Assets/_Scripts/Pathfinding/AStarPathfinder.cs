@@ -8,49 +8,54 @@ namespace Pathfinding
         [SerializeField] private PathGrid _pathGrid;
 
         private readonly List<PathNode> _neighbours = new();
+        private readonly List<PathNode> _openSet = new();
+        private readonly HashSet<PathNode> _closedSet = new();
         
-        public List<Vector3> FindPath(Vector3 startWorldPosition, Vector3 targetWorldPosition)
+        public bool FindPath(Vector3 startWorldPosition, Vector3 targetWorldPosition, List<Vector3> resultPath)
         {
+            resultPath.Clear();
+
             var startNode = _pathGrid.GetNodeFromWorldPosition(startWorldPosition);
             var targetNode = _pathGrid.GetNodeFromWorldPosition(targetWorldPosition);
 
             if (startNode == null || targetNode == null)
             {
-                return null;
+                return false;
             }
 
             if (!startNode.Walkable || !targetNode.Walkable)
             {
-                return null;
+                return false;
             }
 
             _pathGrid.ResetNodes();
 
-            var openSet = new List<PathNode>();
-            var closedSet = new HashSet<PathNode>();
+            _openSet.Clear();
+            _closedSet.Clear();
 
             startNode.GCost = 0;
             startNode.HCost = GetDistanceCost(startNode, targetNode);
 
-            openSet.Add(startNode);
+            _openSet.Add(startNode);
 
-            while (openSet.Count > 0)
+            while (_openSet.Count > 0)
             {
-                var currentNode = GetLowestFCostNode(openSet);
+                var currentNode = GetLowestFCostNode(_openSet);
 
                 if (currentNode == targetNode)
                 {
-                    return BuildWorldPath(targetNode);
+                    BuildWorldPath(targetNode, resultPath);
+                    return resultPath.Count > 0;
                 }
 
-                openSet.Remove(currentNode);
-                closedSet.Add(currentNode);
+                _openSet.Remove(currentNode);
+                _closedSet.Add(currentNode);
                 
                 _pathGrid.GetNeighbours(currentNode, _neighbours);
 
                 foreach (var neighbour in _neighbours)
                 {
-                    if (closedSet.Contains(neighbour))
+                    if (_closedSet.Contains(neighbour))
                     {
                         continue;
                     }
@@ -63,42 +68,44 @@ namespace Pathfinding
                         neighbour.GCost = tentativeGCost;
                         neighbour.HCost = GetDistanceCost(neighbour, targetNode);
 
-                        if (!openSet.Contains(neighbour))
+                        if (!_openSet.Contains(neighbour))
                         {
-                            openSet.Add(neighbour);
+                            _openSet.Add(neighbour);
                         }
                     }
                 }
             }
 
-            return null;
+            return false;
         }
         
-        public List<Vector3> FindPathNearTarget(Vector3 startWorldPosition, Vector3 targetWorldPosition, float acceptableDistance)
+        public bool FindPathNearTarget(Vector3 startWorldPosition, Vector3 targetWorldPosition, float acceptableDistance, List<Vector3> resultPath)
         {
+            resultPath.Clear();
+
             var startNode = _pathGrid.GetNodeFromWorldPosition(startWorldPosition);
 
             if (startNode == null || !startNode.Walkable)
             {
-                return null;
+                return false;
             }
 
             _pathGrid.ResetNodes();
 
-            var openSet = new List<PathNode>();
-            var closedSet = new HashSet<PathNode>();
+            _openSet.Clear();
+            _closedSet.Clear();
 
             startNode.GCost = 0;
             startNode.HCost = GetWorldDistanceCost(startNode.WorldPosition, targetWorldPosition);
 
-            openSet.Add(startNode);
+            _openSet.Add(startNode);
 
             var bestNode = startNode;
             var bestDistance = Vector3.Distance(startNode.WorldPosition, targetWorldPosition);
 
-            while (openSet.Count > 0)
+            while (_openSet.Count > 0)
             {
-                var currentNode = GetLowestFCostNode(openSet);
+                var currentNode = GetLowestFCostNode(_openSet);
 
                 var distanceToTarget = Vector3.Distance(currentNode.WorldPosition, targetWorldPosition);
 
@@ -110,17 +117,18 @@ namespace Pathfinding
 
                 if (distanceToTarget <= acceptableDistance)
                 {
-                    return BuildWorldPath(currentNode);
+                    BuildWorldPath(currentNode, resultPath);
+                    return resultPath.Count > 0;
                 }
 
-                openSet.Remove(currentNode);
-                closedSet.Add(currentNode);
+                _openSet.Remove(currentNode);
+                _closedSet.Add(currentNode);
 
                 _pathGrid.GetNeighbours(currentNode, _neighbours);
                 
                 foreach (var neighbour in _neighbours)
                 {
-                    if (closedSet.Contains(neighbour))
+                    if (_closedSet.Contains(neighbour))
                     {
                         continue;
                     }
@@ -133,9 +141,9 @@ namespace Pathfinding
                         neighbour.GCost = tentativeGCost;
                         neighbour.HCost = GetWorldDistanceCost(neighbour.WorldPosition, targetWorldPosition);
 
-                        if (!openSet.Contains(neighbour))
+                        if (!_openSet.Contains(neighbour))
                         {
-                            openSet.Add(neighbour);
+                            _openSet.Add(neighbour);
                         }
                     }
                 }
@@ -143,10 +151,11 @@ namespace Pathfinding
 
             if (bestNode != startNode)
             {
-                return BuildWorldPath(bestNode);
+                BuildWorldPath(bestNode, resultPath);
+                return resultPath.Count > 0;
             }
 
-            return null;
+            return false;
         }
         
         private int GetWorldDistanceCost(Vector3 a, Vector3 b)
@@ -154,34 +163,30 @@ namespace Pathfinding
             return Mathf.RoundToInt(Vector3.Distance(a, b) * 100f);
         }
 
-        private List<Vector3> BuildWorldPath(PathNode targetNode)
+        private void BuildWorldPath(PathNode targetNode, List<Vector3> resultPath)
         {
-            var path = new List<Vector3>();
+            resultPath.Clear();
+
             var currentNode = targetNode;
 
             while (currentNode != null)
             {
-                path.Add(currentNode.WorldPosition);
+                resultPath.Add(currentNode.WorldPosition);
                 currentNode = currentNode.Parent;
             }
 
-            path.Reverse();
-            return path;
+            resultPath.Reverse();
         }
 
         private PathNode GetLowestFCostNode(List<PathNode> nodes)
         {
             var lowestNode = nodes[0];
 
-            for (int i = 1; i < nodes.Count; i++)
+            for (var i = 1; i < nodes.Count; i++)
             {
                 var node = nodes[i];
 
-                if (node.FCost < lowestNode.FCost)
-                {
-                    lowestNode = node;
-                }
-                else if (node.FCost == lowestNode.FCost && node.HCost < lowestNode.HCost)
+                if (node.FCost < lowestNode.FCost || node.FCost == lowestNode.FCost && node.HCost < lowestNode.HCost)
                 {
                     lowestNode = node;
                 }
