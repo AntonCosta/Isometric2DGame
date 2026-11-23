@@ -216,7 +216,7 @@ namespace Player
             _healUI.fillAmount = 1f - _healedCounter / _healUses;
         }
 
-        public void TakeDamage(float amount)
+        public void TakeDamage(float amount, bool stun = true)
         {
             _health -= amount;
             

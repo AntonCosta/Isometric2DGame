@@ -264,7 +264,7 @@ namespace Enemy
             LostTargetDuringAttack = false;
         }
 
-        public void TakeDamage(float amount)
+        public void TakeDamage(float amount, bool stun = true)
         {
             _health -= amount;
 
@@ -283,9 +283,12 @@ namespace Enemy
             _uiHealthController.UpdateHealth(_health, _maxHealth);
             
             _detectionController.IncreaseDetectionRange(DETECTION_RANGE_INCREASE_AMOUNT);
-            
-            _canMove = false;
-            _animator.SetBool(Utils.TAKE_DAMAGE_HASH, true);
+
+            if (stun)
+            {
+                _canMove = false;
+                _animator.SetBool(Utils.TAKE_DAMAGE_HASH, true);
+            }
         }
         
         public override void EndHurt()

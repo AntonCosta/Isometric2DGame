@@ -48,7 +48,7 @@ namespace Combat
 
             if (other.TryGetComponent(out IDamageable damageable))
             {
-                damageable.TakeDamage(_damage);
+                damageable.TakeDamage(_damage, false);
             }
 
             Deactivate();
