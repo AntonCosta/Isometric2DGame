@@ -25,9 +25,10 @@ namespace Dialogue.Editor
         
         private void OnEnable()
         {
+            rootVisualElement.style.flexDirection = FlexDirection.Column;
             LoadData();
-            ConstructGraphView();
             GenerateToolbar();
+            ConstructGraphView();
         }
         
         private void OnDisable()
@@ -37,9 +38,15 @@ namespace Dialogue.Editor
 
         private void ConstructGraphView()
         {
-            _graphView = new DialogueGraphView() { name = "Dialogue Graph" };
-            
-            _graphView.StretchToParentSize();
+            _graphView = new DialogueGraphView
+            {
+                name = "Dialogue Graph",
+                style =
+                {
+                    flexGrow = 1
+                }
+            };
+
             _graphView.LoadDialogueData(_dialogueData, _responseData);
             rootVisualElement.Add(_graphView);
         }

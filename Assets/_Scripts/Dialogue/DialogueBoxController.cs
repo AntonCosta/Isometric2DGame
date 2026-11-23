@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 namespace Dialogue
 {
@@ -16,6 +17,7 @@ namespace Dialogue
         [SerializeField] private float _typingSpeed = 0.05f;
         [SerializeField] private TextMeshProUGUI _dialogueSpeaker;
         [SerializeField] private TextMeshProUGUI _dialogueText;
+        [SerializeField] private Button _exitButton;
         [SerializeField] private List<ResponseController> _dialogueResponses;
 
         private string _fullText;
@@ -31,6 +33,7 @@ namespace Dialogue
             _dialogueText.text = "";
             _dialogueResponses.ForEach(response => response.gameObject.SetActive(false));
             EndDialogue();
+            _exitButton.onClick.AddListener(EndDialogue);
         }
 
         private void Start()
