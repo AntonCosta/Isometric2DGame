@@ -1,0 +1,32 @@
+﻿{
+  "Dialogues": [
+    {
+      "Id": 0,
+      "Text": ""
+    },
+    {
+      "Id": 1,
+      "Text": "Do you want to see the next line of dialogue?",
+      "PossibleResponse": [1, 2],
+      "Type": "Neutral"
+    },
+    {
+      "Id": 2,
+      "Text": "Do you want the next one or the previous one?",
+      "PossibleResponse": [3, 4],
+      "Type": "Neutral"
+    },
+    {
+      "Id": 3,
+      "Text": "Here is the second to last one.",
+      "PossibleResponse": [5],
+      "Type": "Neutral"
+    },
+    {
+      "Id": 4,
+      "Text": "The End.",
+      "PossibleResponse": [],
+      "Type": "Neutral"
+    }
+  ]
+}

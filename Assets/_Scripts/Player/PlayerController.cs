@@ -43,6 +43,7 @@ namespace Player
         private InputAction _attackAction;
         private InputAction _autoAttackAction;
         private InputAction _healAction;
+        private InputAction _interactAction;
         private Vector2 _moveValue;
         private float _attackValue;
         private Vector2 _lastFacingDirection = Vector2.down;
@@ -63,7 +64,8 @@ namespace Player
             _moveAction = InputSystem.actions.FindAction("Move");
             _attackAction = InputSystem.actions.FindAction("Attack");
             _autoAttackAction = InputSystem.actions.FindAction("AutoAttack");
-            _healAction = InputSystem.actions.FindAction("Interact");
+            _healAction = InputSystem.actions.FindAction("Heal");
+            _interactAction = InputSystem.actions.FindAction("Interact");
             _attackHitbox.gameObject.SetActive(false);
             _autoAttackUI.color = Color.gray;
         }
