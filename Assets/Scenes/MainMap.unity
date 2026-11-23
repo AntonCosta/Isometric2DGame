@@ -57605,7 +57605,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Enemy.EnemyMovementController
   _pathfinder: {fileID: 1274725516}
   _nextPathPointDistance: 0.2
-  _repathInterval: 0.3
+  _repathInterval: 0.5
   _pathTargetDistance: 0.15
   _patrolRoutes:
   - {fileID: 1405882556}

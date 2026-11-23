@@ -17,10 +17,6 @@ namespace Pathfinding
         [SerializeField] private bool _allowDiagonalMovement = true;
         [SerializeField] private bool _preventDiagonalCornerCutting = true;
 
-        [Header("Debug")]
-        [SerializeField] private bool _drawGizmos = true;
-        [SerializeField] private float _gizmoSize = 0.08f;
-
         private readonly Dictionary<Vector3Int, PathNode> _nodes = new();
 
         public bool AllowDiagonalMovement => _allowDiagonalMovement;
@@ -155,18 +151,6 @@ namespace Pathfinding
             }
 
             return walkableNodes;
-        }
-
-        private void OnDrawGizmosSelected()
-        {
-            if (!_drawGizmos || _nodes == null)
-                return;
-
-            foreach (var node in _nodes.Values)
-            {
-                Gizmos.color = node.Walkable ? Color.green : Color.red;
-                Gizmos.DrawSphere(node.WorldPosition, _gizmoSize);
-            }
         }
     }
 }
